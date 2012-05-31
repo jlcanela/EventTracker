@@ -24,6 +24,7 @@ import scalaz.camel.core.Router
 import scalaz._
 import Scalaz._
 import _root_.com.aclys.eventtracker.service.event.EventService
+import _root_.com.aclys.eventtracker.service.report.ReportService
 
 case class ValidationException[T](v : ValidationNEL[String, T]) extends Exception(v.toString)
 
@@ -31,7 +32,7 @@ import net.liftweb.json.JsonAST._
 import rosetta.json.lift._
 import com.mongodb.casbah.Imports._
 
-class CamelService extends Camel with EventService[JValue] {
+class CamelService extends Camel with EventService[JValue] with ReportService[JValue]{
 
   
   import org.apache.camel.CamelContext
@@ -56,7 +57,9 @@ class CamelService extends Camel with EventService[JValue] {
 
   // capture the events
   from("jetty:http://localhost:8080/event") { attempt { registerEvent } fallback displayError }
-  
+
+  from("jetty:http://localhost:8080/reports/userArrival") { attempt { userArrivalReport } fallback displayError }
+
   router.start
 
   def shutdown = {
