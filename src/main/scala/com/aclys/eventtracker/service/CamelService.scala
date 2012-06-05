@@ -44,7 +44,9 @@ class CamelService extends Camel with EventService[JValue] with ReportService[JV
 
   from("jetty:http://localhost:8080/reports/userArrival") { attempt { userArrivalReport } fallback displayError }
 
-  router.start
+  def start = {
+    router.start
+  }
 
   def shutdown = {
     router.stop
