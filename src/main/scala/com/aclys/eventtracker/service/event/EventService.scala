@@ -75,4 +75,11 @@ trait EventService[Json] extends JSonService[Json] with EventProtocol[Json] with
 
   def registerEvent = liftMessage((m: Message) => registerEventImpl(m)) >=> jsonToString 
 
+/*  private def validateMax(i : Int) = if (i < 10) i.success else "must be lower than 10".fail
+  private def validateEven(i : Int) = if (i % 2 == 0) i.success else "must be even".fail
+  
+  private def validateAll(i : Int) = (validateMax(i) |@| validateEven(i)) {
+    (maxOk, minOk) => i
+  }  */
+  
 }
