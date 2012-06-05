@@ -1,17 +1,23 @@
+import com.aclys.eventtracker.service.CamelRunner
 import org.specs2._
+import specification._
 
-class EventRegistrationSpec extends Specification {  def is =
+class EventRegistrationSpec extends Specification with CamelRunner with ApiClient {
 
+  override def map(fs: =>Fragments) = Step(start) ^ super.map(fs) ^
+    Step(stop)
 
-  "This is a specification for the event registration feature"                                    ^
-    p^
-    "The event registration feature enables"                                                      ^
-    "using client API to register a valid event"                                            ! todo^
-    "using client API to generate error when event is not a valid json structure"           ! todo^
-    "using client API to generate error when event is missing either event type or userId"  ! todo^
+  def is =
+
+  "This is a specification for the event registration feature" ^
+    p ^
+    "The event registration feature enables" ^
+    "using client API to register a valid event" ! registerValidEvent ^
+    "using client API to generate error when event is not a valid json structure" ! registerNonJsonEvent ^
+    "using client API to generate error when event is missing either event type or userId" ! registerWithMissingData ^
     end
 
-  val eventTemplate =
+  val aValidEvent =
     """
       |{
       |    "eventType": "userArrival",
@@ -23,10 +29,31 @@ class EventRegistrationSpec extends Specification {  def is =
       |}
     """.stripMargin
 
+  val anInvalidEvent =
+    """
+      |{
+      |    "searchKeyword": "event",
+      |    "referringWebsite": "http://www.google.com",
+      |    "productId": "product:1",
+      |    "category": "Laptop"
+      |}
+    """.stripMargin
+
   val serviceUri = "/event"
 
+  def registerValidEvent = {
+    val r = registerEvent(aValidEvent)
+    r must startWith("""{"creationDate":"201""")
+  }
 
-//  def e1 = "Hello world" must have size(11)
-//  def e2 = "Hello world" must startWith("Hello")
-//  def e3 = "Hello world" must endWith("world")
+  def registerNonJsonEvent = {
+    val r = registerEvent("Non JSon Event")
+    r must startWith("""{"status":"fail","data":"unknown token N""")
+  }
+
+  def registerWithMissingData = {
+    val r = registerEvent(anInvalidEvent)
+    r must be equalTo("""{"status":"fail","data":["eventType is mandatory","userId is mandatory"]}""")
+  }
+
 }

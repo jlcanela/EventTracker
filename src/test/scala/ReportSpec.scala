@@ -1,13 +1,18 @@
+import com.aclys.eventtracker.service.CamelRunner
 import org.specs2._
+import specification._
 
-class ReportSpec extends Specification { def is =
+class ReportSpec extends Specification with CamelRunner with ApiClient {
+
+  override def map(fs: =>Fragments) = Step(start) ^ super.map(fs) ^
+    Step(stop)
+
+  def is =
 
   "This is a specification for the userArrival Event report"                                      ^
     p^
-    "The event registration feature enables"                                                      ^
-    "using client API to register a valid event"                                            ! todo^
-    "using client API to generate error when event is not a valid json structure"           ! todo^
-    "using client API to generate error when event is missing either event type or userId"  ! todo^
+    "The userArrival Event report enables"                                                      ^
+    "using client API to get a report"                                            ! reportIsAccessible^
     end
 
   val reportTemplate =
@@ -28,7 +33,9 @@ class ReportSpec extends Specification { def is =
 
   val serviceUri = "reports/userArrival"
 
-//  def e1 = "Hello world" must have size(11)
-//  def e2 = "Hello world" must startWith("Hello")
-//  def e3 = "Hello world" must endWith("world")
+  def reportIsAccessible = {
+    val r = getReport()
+    r must startWith("""{"date-start":"2000-01-01","date-end":"2012-12-31","data":[{"date":""")
+  }
+
 }

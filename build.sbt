@@ -26,6 +26,7 @@ libraryDependencies ++= {
 
 // Customize any further dependencies as desired
 libraryDependencies ++= Seq(
+  "net.databinder.dispatch" %% "core" % "0.9.0-beta1",
   "joda-time" % "joda-time" % "2.1",  
   "org.joda" % "joda-convert" % "1.2",
   "org.scalaz" %% "scalaz-core" % "6.0.4",
@@ -55,3 +56,4 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "jcl-over-slf4j" % "1.6.4" // only used for debugging.
 )
 
+parallelExecution in Test := false
