@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011 WorldWide Conferencing, LLC
+ * Copyright 2012 Aclys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package com.aclys.eventtracker.service.report
+package service.report
 
-import com.aclys.eventtracker.service.JSonService
-import com.aclys.eventtracker.service.ValidationException
-import com.aclys.eventtracker.service.event.EventProtocol
+import service.JSonService
+import service.ValidationException
+import service.event.EventProtocol
 import net.debasishg.sjson.json._
 import org.joda.time.DateTime
 import rosetta.json.JsonImplementation
 import scalaz.camel.core._
 import scalaz._
 import Scalaz._
-import net.liftweb._
-import json.JsonAST.{ JValue, JString }
-	      
+//import net.liftweb._
+//import json.JsonAST.{ JValue, JString }
+
 import com.mongodb.casbah.Imports._
 	      
 trait ReportService[Json] extends JSonService[Json] with EventProtocol[Json] with JsonSerialization[Json] {
-  this: Camel =>
 
   val jsonImplementation: JsonImplementation[Json]
   import jsonImplementation._
@@ -39,7 +38,7 @@ trait ReportService[Json] extends JSonService[Json] with EventProtocol[Json] wit
   
   val eventColl : MongoCollection
 
-  def userArrivalReportImpl = { 
+  def userArrivalReport = {
 
     // NOTE : current implementation does not save to mongodb the date in the right format
     // so it's not yet possible to search by start-date / end-date
@@ -163,6 +162,5 @@ trait ReportService[Json] extends JSonService[Json] with EventProtocol[Json] wit
     ).success    
   }
   
-  def userArrivalReport = liftMessage((m: Message) => userArrivalReportImpl) >=> jsonToString 
 
 }
