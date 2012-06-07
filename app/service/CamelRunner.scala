@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011 WorldWide Conferencing, LLC
+ * Copyright 2012 Aclys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-import java.io._ 
+package service
 
-object Startup {
-  def main(args: Array[String]) {
-    val cs = new com.aclys.eventtracker.service.CamelService
-  
-    println("\npress enter to exit application")
-    
-    val br = new BufferedReader(new InputStreamReader(System.in));
-    br.readLine();    
-    
-    cs.shutdown
-  }
+trait CamelRunner {
+
+  //lazy val cs = new CamelService
+
+  def start = {} //cs.start
+
+  def stop = {} //cs.shutdown
+
+
 }

@@ -26,6 +26,7 @@ libraryDependencies ++= {
 
 // Customize any further dependencies as desired
 libraryDependencies ++= Seq(
+  "net.databinder.dispatch" %% "core" % "0.9.0-beta1",
   "joda-time" % "joda-time" % "2.1",  
   "org.joda" % "joda-convert" % "1.2",
   "org.scalaz" %% "scalaz-core" % "6.0.4",
@@ -47,6 +48,7 @@ libraryDependencies ++= Seq(
   "org.eclipse.jetty" % "jetty-webapp" % "7.5.4.v20111024" % "container,test->default",
   "org.scala-tools.testing" % "specs_2.9.0" % "1.6.8" % "test", // For specs.org tests
   "junit" % "junit" % "4.8" % "test->default", // For JUnit 4 testing
+  "org.specs2" %% "specs2" % "1.11" % "test",
   "org.scalatest" %% "scalatest" % "1.7.2" % "test",
   "javax.servlet" % "servlet-api" % "2.5" % "provided->default",
   "com.h2database" % "h2" % "1.2.138", // In-process database, useful for development systems
@@ -54,3 +56,4 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "jcl-over-slf4j" % "1.6.4" // only used for debugging.
 )
 
+parallelExecution in Test := false
