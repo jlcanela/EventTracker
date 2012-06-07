@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011 WorldWide Conferencing, LLC
+ * Copyright 2012 Aclys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.aclys.eventtracker.service.event
+package service.event
 
-import com.aclys.eventtracker.service.JSonService
-import com.aclys.eventtracker.service.ValidationException
+import service.JSonService
+import service.ValidationException
 import net.debasishg.sjson.json._
 import org.joda.time.DateTime
 import rosetta.json.JsonImplementation
@@ -28,9 +28,10 @@ import net.liftweb._
 import json.JsonAST.{ JValue, JString }
 	      
 import com.mongodb.casbah.Imports._
-	      
+import java.io.ObjectInputStream
+
 trait EventService[Json] extends JSonService[Json] with EventProtocol[Json] with JsonSerialization[Json] {
-  this: Camel =>
+
 
   val jsonImplementation: JsonImplementation[Json]
   import jsonImplementation._
@@ -40,7 +41,7 @@ trait EventService[Json] extends JSonService[Json] with EventProtocol[Json] with
   
   private def convert2Mongo(j : Json) : Validation[String,MongoDBObject] = try {
     // will be more typesafe to use a MongoJson implementation for rosetta, let's do that later
-	com.mongodb.util.JSON.parse(j2s(j)) match {
+  	com.mongodb.util.JSON.parse(j2s(j)) match {
 		    case obj : BasicDBObject => Success(obj) //.success.liftFailNel
 		    case x => "Failed convert2Mongo (classname=%s)".format(x.getClass.getName).fail
 	} 
@@ -49,16 +50,16 @@ trait EventService[Json] extends JSonService[Json] with EventProtocol[Json] with
     case ex => ex.getMessage.fail
   }
   
-  private def persistEvent(e: Event) : ValidationNEL[String, Boolean] = for {
+  private def persistEvent(e: Event) : ValidationNEL[String, (Boolean, Json)] = for {
 	      json <- tojson(e)
 	      res <- persistEvent(json)
    } yield res 
   
-  private def persistEvent(json: Json) : ValidationNEL[String, Boolean] = try {
+  private def persistEvent(json: Json) : ValidationNEL[String, (Boolean, Json)] = try {
 	  for {
 	      mongoObject <- convert2Mongo(json).liftFailNel
 	      wr = eventColl.save(mongoObject)	      
-	  } yield wr.getLastError.ok
+	  } yield (wr.getLastError.ok, json)
   } catch {
     case ex => ex.printStackTrace; "FailedPersistEvent : %s".format(ex.getMessage).fail.liftFailNel
   }
@@ -77,19 +78,17 @@ trait EventService[Json] extends JSonService[Json] with EventProtocol[Json] with
     case Success(uid) => Success(uid)
     case Failure(e) => "userId is mandatory".fail.liftFailNel
   }
-  
-  
-  private def registerEventImpl(m: Message): ValidationNEL[String, Json] = for {
-    j <- postJson(m)
+
+  def convertEvent(j: Json) = for {
     e <- (creationDate(j.get("creationDate")) |@| eventType(j.get("eventType")) |@| userId(j.get("userId"))) {
       (creationDate, eventType, uid) => Event(creationDate, eventType, uid, j) // TODO: CAUTION, using localdate, check what date is used by the client API
-    }
-    persisted <- persistEvent(e) 
-    json <- tojson(e)
-  } yield json
+    }} yield e
 
+   def registerEvent(j: Json): ValidationNEL[String, Json] = for {
+     e <- convertEvent(j)
+     r <- persistEvent(e)
+   } yield j
 
-  def registerEvent = liftMessage((m: Message) => registerEventImpl(m)) >=> jsonToString 
 
 /*  private def validateMax(i : Int) = if (i < 10) i.success else "must be lower than 10".fail
   private def validateEven(i : Int) = if (i % 2 == 0) i.success else "must be even".fail

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011 WorldWide Conferencing, LLC
+ * Copyright 2012 Aclys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.aclys.eventtracker.service.event
+package service.event
 
-import com.aclys.eventtracker.service.SerializationHelper
+import service.SerializationHelper
 import net.debasishg.sjson.json._
 import org.joda.time.{DateTime, LocalDate}
 import rosetta.json.JsonImplementation
@@ -29,7 +29,8 @@ trait EventProtocol[Json] extends DefaultProtocol[Json] with SerializationHelper
 
   object EventProtocol {
 
-    case class Event(creationDate: DateTime, eventType: String, userId: String, data: Json)    
+    case class Event(creationDate: DateTime, eventType: String, userId: String, data: Json)
+
     implicit val EventFormat: Format[Event, Json] =
       asProduct4("creationDate", "eventType", "userId", "data")(Event)(Event.unapply(_).get)
 

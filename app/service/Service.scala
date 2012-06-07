@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011 WorldWide Conferencing, LLC
+ * Copyright 2012 Aclys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aclys.eventtracker.service
+package service
 
 import org.apache.camel.impl.DefaultCamelContext
 import org.apache.camel.CamelContext
@@ -23,25 +23,27 @@ import scalaz.camel.core.Message
 import scalaz.camel.core.Router
 import scalaz._
 import Scalaz._
-import _root_.com.aclys.eventtracker.service.event.EventService
-import _root_.com.aclys.eventtracker.service.report.ReportService
+import _root_.service.event.EventService
+import _root_.service.report.ReportService
+//import net.liftweb.json.JsonAST._
+import play.api.libs.json._
+
+//import rosetta.json.lift._
+import com.mongodb.casbah.Imports._
 
 case class ValidationException[T](v : ValidationNEL[String, T]) extends Exception(v.toString)
 
-import net.liftweb.json.JsonAST._
-import rosetta.json.lift._
-import com.mongodb.casbah.Imports._
 
-class CamelService extends Camel with EventService[JValue] with ReportService[JValue]{
+class Service extends EventService[JsValue] with ReportService[JsValue]{
 
   
-  import org.apache.camel.CamelContext
-  import org.apache.camel.impl.DefaultCamelContext
+//  import org.apache.camel.CamelContext
+//  import org.apache.camel.impl.DefaultCamelContext
 
-  import dispatch.json.JsValue
+//  import dispatch.json.JsValue
  
-  val jsonImplementation = JsonLift // selecting lift-json implementation for rosetta stone
-  val mf : Manifest[JValue] = Manifest.classType(classOf[JValue]) // keep a concrete reference to JValue manifest for JSonService 
+  val jsonImplementation = JsonPlay // selecting lift-json implementation for rosetta stone
+  val mf : Manifest[JsValue] = Manifest.classType(classOf[JsValue]) // keep a concrete reference to JValue manifest for JSonService
 
   val mongoConnection = MongoConnection()
   val mongoDbName = "eventtracker"
@@ -49,23 +51,25 @@ class CamelService extends Camel with EventService[JValue] with ReportService[JV
 
   val eventColl = mongoConnection(mongoDbName)(mongoEventCollName)
 
-  val camelContext: CamelContext = new DefaultCamelContext
-  implicit val router = new Router(camelContext)
+//  val camelContext: CamelContext = new DefaultCamelContext
+//  implicit val router = new Router(camelContext)
 
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterConversionHelpers()
 
   // capture the events
-  from("jetty:http://localhost:8080/event") { attempt { registerEvent } fallback displayError }
+//  from("jetty:http://localhost:8080/event")  { attempt { registerEvent } fallback displayError }
 
-  from("jetty:http://localhost:8080/reports/userArrival") { attempt { userArrivalReport } fallback displayError }
+//  from("direct:event") to("esper://event")
+
+ // from("jetty:http://localhost:8080/reports/userArrival") { attempt { userArrivalReport } fallback displayError }
 
   def start = {
-    router.start
+    //router.start
   }
 
   def shutdown = {
-    router.stop
+    //router.stop
   }
 
 
