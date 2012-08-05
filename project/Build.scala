@@ -7,12 +7,11 @@ object ApplicationBuild extends Build {
   val appName         = "eventtracker"
   val appVersion      = "1.0"
 
-
   val appDependencies = Seq(
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-    // Add your own project settings here
+    // You can add additionnal project settings here
   )
 
 
