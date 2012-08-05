@@ -15,9 +15,15 @@
  */
 
 import dispatch._
+import play.api.mvc.{Result, SimpleResult}
+import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.libs.json.{JsNull, JsString, JsValue, Json}
 
-trait ApiClient {
+import play.api.test._
+import play.api.test.Helpers._
 
+
+trait ApiHttpClient {
   private def localhost = host("localhost", 8080)
 
   def registerEvent(event: String) : String = {
@@ -29,4 +35,18 @@ trait ApiClient {
     val req = (localhost / "reports" / report)
     Http(req > As.string).apply()
   }
+}
+
+trait ApiClient {
+
+  def registerEvent(event: String) : Result = {
+    val param = Json.parse(event)
+    controllers.Application.event(FakeRequest("POST", "uri", FakeHeaders(Map()), param))
+  }
+
+  def userArrival() : Result = {
+    controllers.Application.userArrival(FakeRequest("GET", "uri"))
+  }
+
+
 }

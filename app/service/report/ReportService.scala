@@ -158,7 +158,7 @@ trait ReportService[Json] extends JSonService[Json] with EventProtocol[Json] wit
         "date-start" -> JsonString("2000-01-01"), 
         "date-end" -> JsonString("2012-12-31"),
         "data" -> JsonArray( report.map(toJson _) )            
-    ).success    
+    ).success
   }
   
 

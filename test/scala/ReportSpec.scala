@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-import com.aclys.eventtracker.service.CamelRunner
 import org.specs2._
+import play.api.test.FakeApplication
+import play.api.test.Helpers._
 import specification._
 
-class ReportSpec extends Specification with CamelRunner with ApiClient {
-
-  override def map(fs: =>Fragments) = Step(start) ^ super.map(fs) ^
-    Step(stop)
+class ReportSpec extends Specification with ApiClient {
 
   def is =
 
-  "This is a specification for the userArrival Event report"                                      ^
+  "This is a specification for the userArrival Event report"                                    ^
     p^
     "The userArrival Event report enables"                                                      ^
     "using client API to get a report"                                            ! reportIsAccessible^
@@ -49,9 +47,9 @@ class ReportSpec extends Specification with CamelRunner with ApiClient {
 
   val serviceUri = "reports/userArrival"
 
-  def reportIsAccessible = {
-    val r = getReport()
-    r must startWith("""{"date-start":"2000-01-01","date-end":"2012-12-31","data":[{"date":""")
+  def reportIsAccessible = running(FakeApplication()) {
+    val r = userArrival
+    contentAsString(r) must contain("""{"date-start":"2000-01-01","date-end":"2012-12-31","data":[{"date":""")
   }
 
 }
