@@ -21,7 +21,6 @@ import service.ValidationException
 import net.debasishg.sjson.json._
 import org.joda.time.DateTime
 import rosetta.json.JsonImplementation
-import scalaz.camel.core._
 import scalaz._
 import Scalaz._
 import net.liftweb._
